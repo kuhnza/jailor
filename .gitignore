@@ -1,2 +1,10 @@
 .DS_Store
 autom4te.cache
+*.o
+jailor
+Makefile
+config.h
+config.log
+config.status
+.deps
+stamp-h1
