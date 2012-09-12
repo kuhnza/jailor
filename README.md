@@ -1,7 +1,7 @@
 Jailor
 ======
 
-Jailor is a simple program for launching applications as a given user (usually
+Jailor is a small, fast and extremely lightweight program for launching applications as a given user (usually
 unprivileged) inside a chroot jail. 
 
 Installation
