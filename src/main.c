@@ -8,7 +8,7 @@ void usage()
 {
     printf("\nUsage: jailor [OPTION]... /path/to/program [ARGS...]\n");
     printf("\n");
-    printf("  Options:\n");
+    printf("Options:\n");
     printf("  -u \tThe user to run the program as. Defaults to `nobody`.\n");
     printf("  -j \tPath to your chroot jail directory. Defaults to `/var/jail`.\n");
     exit(1);
@@ -22,8 +22,9 @@ int main(int argc, char **argv)
     struct passwd *p;
 
     /* Check that we have root privileges. We'll need them to chroot later on. */
-    if (setuid(0)) {
+    if (setuid(0)) {        
         perror("setuid");
+        fprintf(stderr, "Program must be run as root.");
         usage();
     }
 
@@ -47,7 +48,7 @@ int main(int argc, char **argv)
     }
 
     if (optind >= argc) {
-        fprintf(stderr, "Missing required argument `program`");
+        fprintf(stderr, "Missing required argument `program`.");
         usage();
     } 
 
