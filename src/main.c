@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     }
 
     /* Perform some argument parsing. */
-    while ((c = getopt (argc, argv, "c:j:u:")) != -1) {
+    while ((c = getopt (argc, argv, "d:j:u:")) != -1) {
         switch (c) {
             case 'd':
                 cwd = optarg;
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     setuid(p->pw_uid);
 
     /* Change directory if -d option supplied. */
-    if (cwd == NULL) {
+    if (cwd != NULL) {
         chdir(cwd);
     }
 
