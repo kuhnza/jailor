@@ -18,7 +18,7 @@ void usage()
 int main(int argc, char **argv) 
 {
     int c, i;
-    char *prog, *cwd = NULL, *jail_dir = NULL, *user = NULL;
+    char *prog, *wd = NULL, *jail_dir = NULL, *user = NULL;
     char **params;
     struct passwd *p;
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     while ((c = getopt (argc, argv, "d:j:u:")) != -1) {
         switch (c) {
             case 'd':
-                cwd = optarg;
+                wd = optarg;
                 break;
             case 'j':
                 jail_dir = optarg;                
@@ -72,19 +72,33 @@ int main(int argc, char **argv)
         jail_dir = "/var/jail";
     }
 
-    /* Lower privileges before launching. */
-    chdir(jail_dir);
-    if (chroot(jail_dir) != 0) {
-        perror("chroot");
-        usage();
+    /* Change the CWD to the jail so we don't end up becoming a gateway 
+     * out of the jail. */
+    if (chdir(jail_dir) != 0) {
+        fprintf(stderr, "chdir: %s: ", jail_dir);
+        perror("");
+        exit(1);
     }
+
+    /* Enter jail. */
+    if (chroot(jail_dir) != 0) {
+        fprintf(stderr, "chroot: %s: ", jail_dir);
+        perror("");
+        exit(1);
+    }
+
+    /* Change working directory if -d option supplied. */
+    if (wd != NULL) {
+        if (chdir(wd) != 0) {
+            fprintf(stderr, "chdir: %s: ", wd);
+            perror("");
+            exit(1);
+        }
+    }
+
+    /* Lower privileges before launching. */
     setgid(p->pw_gid);
     setuid(p->pw_uid);
-
-    /* Change directory if -d option supplied. */
-    if (cwd != NULL) {
-        chdir(cwd);
-    }
 
     /* Launch process inside our jail using remaining non-argument options. */
     prog = argv[optind];    
