@@ -8,16 +8,17 @@ void usage()
 {
     printf("\nUsage: jailor [OPTION]... /path/to/program [ARGS...]\n");
     printf("\n");
-    printf("Options:\n");
-    printf("  -u \tThe user to run the program as. Defaults to `nobody`.\n");
+    printf("Options:\n");        
+    printf("  -d \tChange current working directory before executing program. Defaults to root directory of jail.\n");
     printf("  -j \tPath to your chroot jail directory. Defaults to `/var/jail`.\n");
+    printf("  -u \tThe user to run the program as. Defaults to `nobody`.\n");
     exit(1);
 }
 
 int main(int argc, char **argv) 
 {
     int c, i;
-    char *prog, *jail_dir = NULL, *user = NULL;
+    char *prog, *cwd = NULL, *jail_dir = NULL, *user = NULL;
     char **params;
     struct passwd *p;
 
@@ -29,16 +30,19 @@ int main(int argc, char **argv)
     }
 
     /* Perform some argument parsing. */
-    while ((c = getopt (argc, argv, "u:j:")) != -1) {
+    while ((c = getopt (argc, argv, "c:j:u:")) != -1) {
         switch (c) {
-            case 'u':
-                user = optarg;
+            case 'd':
+                cwd = optarg;
                 break;
             case 'j':
                 jail_dir = optarg;                
                 break;
+            case 'u':
+                user = optarg;
+                break;            
             case '?':
-                if (optopt == 'u' || optopt == 'j') {
+                if (optopt == 'd' || optopt == 'j' || optopt == 'u') {
                     fprintf(stderr, "Option -%c requires an argument.\n", optopt);
                 }
                 break;
@@ -76,6 +80,11 @@ int main(int argc, char **argv)
     }
     setgid(p->pw_gid);
     setuid(p->pw_uid);
+
+    /* Change directory if -d option supplied. */
+    if (cwd == NULL) {
+        chdir(cwd);
+    }
 
     /* Launch process inside our jail using remaining non-argument options. */
     prog = argv[optind];    
