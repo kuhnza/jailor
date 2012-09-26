@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     if (user == NULL) {
         user = "nobody";
     } else {
-        if (user == "root") {
+        if (strcmp(user, "root") == 0) {
             fprintf(stderr, "Running jailed program as root is not permitted.");
             usage();
         }
