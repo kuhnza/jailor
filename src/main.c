@@ -22,10 +22,10 @@ int main(int argc, char **argv)
     char **params;
     struct passwd *p;
 
-    /* Check that we have root privileges. We'll need them to chroot later on. */
+    /* Check that we have setuid permissions. We'll need them to chroot later on. */
     if (setuid(0)) {        
         perror("setuid");
-        fprintf(stderr, "Program must be run as root.");
+        fprintf(stderr, "Program must be run as root or have setuid permissions.");
         usage();
     }
 
@@ -59,6 +59,11 @@ int main(int argc, char **argv)
     /* Default user to `nobody` if -u argument not provided. */ 
     if (user == NULL) {
         user = "nobody";
+    } else {
+        if (user == "root") {
+            fprintf(stderr, "Running jailed program as root is not permitted.");
+            usage();
+        }
     }
 
     /* Get the UID of the specified account. */
